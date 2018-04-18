@@ -25,15 +25,15 @@ COLOR[END]="\e[0m"
 function header() {
     clear
     echo -e ${COLOR[CYAN]};
-    echo "    _____ __             __                                        ";
-    echo "   / ___// /_____ ______/ /_   ________  ______   _____  __________";
-    echo "   \__ \/ __/ __ \`/ ___/ __/  / ___/ _ \/ ___/ | / / _ \/ ___/ ___/";
-    echo "  ___/ / /_/ /_/ / /  / /_   (__  )  __/ /   | |/ /  __/ /  (__  ) ";
-    echo " /____/\__/\__,_/_/   \__/  /____/\___/_/    |___/\___/_/  /____/  ";
-    echo "                                                                   ";
-    echo "                 +-+-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+                 ";
-    echo "                 |D|e|v|e|l|o|p| |b|y| |F|e|n|y|r|                 ";
-    echo "                 +-+-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+                 ";
+    echo "   _____                               _  __    ___  _  _   ";
+    echo "  |  ___|__  ___ _ ____   _____ _ __  / |/ /_  / _ \| || |  ";
+    echo "  | |_ / __|/ _ \ '__\ \ / / _ \ '__| | | '_ \| | | | || |_ ";
+    echo "  |  _|\__ \  __/ |   \ V /  __/ |    | | (_) | |_| |__   _|";
+    echo "  |_|  |___/\___|_|    \_/ \___|_|    |_|\___(_)___/   |_|  ";
+    echo "                                                            ";
+    echo "             +-+-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+              ";
+    echo "             |D|e|v|e|l|o|p| |b|y| |F|e|n|y|r|              ";
+    echo "             +-+-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+              ";
     echo
     #echo -e ${COLOR[RED]}"File name: $0"
     echo
@@ -111,7 +111,40 @@ function uninstall_package() {
 }
 
 function dns_conf() {
-    echo "Hello"
+    while [[ "$REPLY" != 0 ]]; do
+        clear
+        header
+        echo -e ${COLOR[YELLOW]}"-- $server_name options --";
+        echo 
+        echo "  1. Backup files";
+        echo "  2. Return";
+        echo "  0. Exit";
+        echo
+        read -p "What do you want to do? " -n 1
+        echo -e 
+
+        case $REPLY in
+            0)
+                echo -e ${COLOR[GREEN]}"Done"
+            ;;
+            1)
+                if [ -d "/etc/bind/" ] 
+                then
+                    echo "Directory exist"
+                fi
+                press_any_key
+            ;;
+            2)
+                break
+            ;;
+
+            *)
+                echo -e ${COLOR[RED]}"Invalid option"
+                press_any_key
+            ;;
+        esac
+        
+    done
 }
 
 function server_conf() {
@@ -123,7 +156,7 @@ function server_conf() {
     while [[ "$REPLY" != 0 ]]; do
         clear
         header
-        echo -e ${COLOR[WHITE]}"-- $server_name options --";
+        echo -e ${COLOR[YELLOW]}"-- $server_name options --";
         echo 
         echo "  1. Check if it is installed";
         echo "  2. Install";
@@ -168,8 +201,6 @@ function server_conf() {
                         dns_conf
                     ;;
                 esac
-                
-                press_any_key
             ;;
             5)
                 break
@@ -201,7 +232,6 @@ while [[ "$REPLY" != 0 ]]; do
 
     case $REPLY in
         0)
-            clear
             echo -e ${COLOR[GREEN]}"Program terminated .... [OK]"
         ;;
         1)
