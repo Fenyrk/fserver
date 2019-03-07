@@ -1,5 +1,10 @@
 #!/bin/bash
 
+source util/echo.sh
+source util/system.sh
+
+require_root
+
 trap '' 2 # You can't use Ctrl+C to terminate the process
 
 # Servers
@@ -24,90 +29,16 @@ COLOR[END]="\e[0m"
 # Header about
 function header() {
     clear
-    echo -e ${COLOR[CYAN]};
-    echo "   _____                               _  __    ___  _  _   ";
-    echo "  |  ___|__  ___ _ ____   _____ _ __  / |/ /_  / _ \| || |  ";
-    echo "  | |_ / __|/ _ \ '__\ \ / / _ \ '__| | | '_ \| | | | || |_ ";
-    echo "  |  _|\__ \  __/ |   \ V /  __/ |    | | (_) | |_| |__   _|";
-    echo "  |_|  |___/\___|_|    \_/ \___|_|    |_|\___(_)___/   |_|  ";
-    echo "                                                            ";
-    echo "             +-+-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+              ";
-    echo "             |D|e|v|e|l|o|p| |b|y| |F|e|n|y|r|              ";
-    echo "             +-+-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+              ";
-    echo
-    #echo -e ${COLOR[RED]}"File name: $0"
-    echo
-}
-
-function press_any_key() {
-    echo -en ${COLOR[GREEN]}"\nPress any key to continue... "
-    read -n 1 key
-}
-
-function check_connection() {
-
-    echo -e ${COLOR[BLUE]}"Checking internet connection... "
-    ping -c 4 www.google.com &> /dev/null;
-    if [ $? -eq 0 ]; then
-        echo -e ${COLOR[GREEN]}"Internet connection ..... [OK]"
-        return 0
-    else
-        echo -e ${COLOR[RED]}"There is no Internet connection ..... [FAILED]"
-        return 1
-    fi
-
-}
-
-function is_installed() {
-
-    echo -e ${COLOR[BLUE]}"Checking if $1 is installed... "
-    dpkg --get-selections $1 2> /dev/null | grep -o $1 > /dev/null
-
-    if [ $? -eq 0 ]; then
-        echo -e ${COLOR[GREEN]}"$1 is installed ..... [OK]"
-        return 0
-    else
-        echo -e ${COLOR[RED]}"$1 is not installed ..... [FAILED]"
-        return 1
-    fi
-    
-}
-
-function update_system() {
-
-    echo -e ${COLOR[BLUE]}"Updating system..."
-    sudo apt-get update > /dev/null;
-    sudo apt-get upgrade -y > /dev/null;
-    echo -e ${COLOR[GREEN]}"System updated ..... [OK]"
-
-}
-
-function install_package() {
-
-    echo -e ${COLOR[BLUE]}"Installing $1..."
-    sudo apt-get install $1 -y > /dev/null;
-    if [ $? -eq 0 ]; then 
-        echo -e ${COLOR[GREEN]}"$1 installed ..... [OK]"
-        return 0
-    else
-        echo -e ${COLOR[RED]}"$1 not installed ..... [FAILED]"
-        return 1
-    fi
-
-}
-
-function uninstall_package() {
-
-    echo -e ${COLOR[BLUE]}"Uninstalling $1..."
-    sudo apt-get remove --purge $1 -y > /dev/null;
-    if [ $? -eq 0 ]; then 
-        echo -e ${COLOR[GREEN]}"$1 uninstalled ..... [OK]"
-        return 0
-    else
-        echo -e ${COLOR[RED]}"$1 not installed ..... [FAILED]"
-        return 1
-    fi
-
+    echo.success_b "   _____                               _  __    ___  _  _   ";
+    echo.success_b "  |  ___|__  ___ _ ____   _____ _ __  / |/ /_  / _ \| || |  ";
+    echo.success_b "  | |_ / __|/ _ \ '__\ \ / / _ \ '__| | | '_ \| | | | || |_ ";
+    echo.success_b "  |  _|\__ \  __/ |   \ V /  __/ |    | | (_) | |_| |__   _|";
+    echo.success_b "  |_|  |___/\___|_|    \_/ \___|_|    |_|\___(_)___/   |_|  ";
+    echo.success_b "                                                            ";
+    echo.success_b "             +-+-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+              ";
+    echo.success_b "             |D|e|v|e|l|o|p| |b|y| |F|e|n|y|r|              ";
+    echo.success_b "             +-+-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+              ";
+    # echo.info_b "File name: $0"
 }
 
 function dns_conf() {
@@ -132,7 +63,7 @@ function dns_conf() {
                 then
                     echo "Directory exist"
                 fi
-                press_any_key
+                readKey
             ;;
             2)
                 break
@@ -140,7 +71,7 @@ function dns_conf() {
 
             *)
                 echo -e ${COLOR[RED]}"Invalid option"
-                press_any_key
+                readKey
             ;;
         esac
         
@@ -170,29 +101,19 @@ function server_conf() {
 
         case $REPLY in
             0)
-                echo -e ${COLOR[GREEN]}"Done"
+                echo.success_b "Done"
             ;;
             1) 
                 is_installed $server_package
-                press_any_key
+                readKey
             ;;
             2)
-                is_installed $server_package
-                if [ $? -eq 1 ]; then
-                    check_connection
-                    if [ $? -eq 0 ]; then
-                        update_system
-                        install_package $server_package
-                    fi
-                fi
-                press_any_key
+                install_package $server_package
+                readKey
             ;;
             3)
-                is_installed $server_package
-                if [ $? -eq 0 ]; then
-                    uninstall_package $server_package
-                fi
-                press_any_key
+                uninstall_package $server_package
+                readKey
             ;;
             4)
                 case $server_package in
@@ -206,12 +127,11 @@ function server_conf() {
                 break
             ;;
             *) 
-                echo -e ${COLOR[RED]}"Invalid option"
-                press_any_key
+                echo.error_b "Invalid option"
+                readKey
             ;;
         esac
     done
-    
 }
 
 while [[ "$REPLY" != 0 ]]; do
@@ -251,7 +171,7 @@ while [[ "$REPLY" != 0 ]]; do
         ;;
         *)
             echo -e ${COLOR[RED]}"Invalid option"
-            press_any_key
+            readKey "Presiona una tecla para continuar..."
         ;;
     esac
 
